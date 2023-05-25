@@ -1,25 +1,111 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import styled from "styled-components";
 
-function App() {
+const Navbar = styled.nav`
+  background: #f2f2f2;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+`;
+
+const BrandName = styled.span`
+  font-weight: bold;
+`;
+
+const Button = styled.button`
+  background: #3498db;
+  color: #fff;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+`;
+
+const Loader = styled.div`
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+`;
+
+const CardGrid = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  margin-top: 20px;
+`;
+
+const UserCard = styled.div`
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 20px;
+  border-radius: 4px;
+`;
+
+const UserAvatar = styled.img`
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-bottom: 5px;
+`;
+
+const UserName = styled.h3`
+  font-size: 16px;
+  margin-bottom: 5px;
+`;
+
+const UserEmail = styled.p`
+  font-size: 14px;
+  color: #666;
+`;
+
+const App = () => {
+  const [loading, setLoading] = useState(false);
+  const [users, setUsers] = useState([]);
+
+  const getUsers = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch("https://reqres.in/api/users?page=1");
+      const data = await response.json();
+      setUsers(data.data);
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Navbar>
+        <BrandName>Brand Name</BrandName>
+        <Button onClick={getUsers} disabled={loading}>
+          {loading ? <Loader /> : "Get Users"}
+        </Button>
+      </Navbar>
+      <CardGrid>
+        {users.map((user) => (
+          <UserCard key={user.id}>
+            <UserAvatar src={user.avatar} alt={user.first_name} />
+            <UserName>{`${user.first_name} ${user.last_name}`}</UserName>
+            <UserEmail>{user.email}</UserEmail>
+          </UserCard>
+        ))}
+      </CardGrid>
     </div>
   );
-}
+};
 
 export default App;
